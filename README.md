@@ -6,6 +6,8 @@ This tool simplifies `raindrop_desc.json` file creation process without the need
 
 For additional info regarding `Ripple Map` creation and specification, see [rF2 developers guide](https://docs.studio-397.com/developers-guide/car-development/car-art/rain-effects-and-windscreen-shaders-for-cars).
 
+![preview](https://github.com/user-attachments/assets/8ddc8446-1bda-43c5-b449-6dea979b5a63)
+
 
 ## Usage
 
