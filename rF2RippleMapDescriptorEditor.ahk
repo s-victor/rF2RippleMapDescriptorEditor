@@ -270,6 +270,7 @@ MatchComboIndex(text, data_array)
 
 RippleDescriptorJsonParser(filename)
 {
+    EMPTY_DESC := "RF@CTOR2"  ; placeholer for replacing empty string
     temp_dict := Map()
     level := 0
     sub_key1 := ""
@@ -281,8 +282,12 @@ RippleDescriptorJsonParser(filename)
     ; Read raindrop_desc.json file
     Loop read, filename
     {
+        raw_line := RegExReplace(
+            StrReplace(A_LoopReadLine, "`"`"", "`"" EMPTY_DESC "`""),
+            "`" *`"$", "`"" EMPTY_DESC "`""
+        )
         ; Delimiter by quotation mark, line break
-        Loop Parse, A_LoopReadLine, "`r`n`""
+        Loop Parse, raw_line, "`r`n`""
         {
             ; Remove leading & trailing space/tab/comma/colon
             value_strip := Trim(A_LoopField, A_Tab A_Space ":,")
@@ -319,17 +324,18 @@ RippleDescriptorJsonParser(filename)
             if (check_next_value)
             {
                 check_next_value := false
+                temp_value := StrReplace(value_strip, EMPTY_DESC, "")
                 if (level = 1)
                 {
-                    temp_dict[sub_key1] := value_strip
+                    temp_dict[sub_key1] := temp_value
                 }
                 else if (level = 2)
                 {
-                    temp_dict[sub_key1][sub_key2] := value_strip
+                    temp_dict[sub_key1][sub_key2] := temp_value
                 }
                 else if (level = 3)
                 {
-                    temp_dict[sub_key1][sub_key2][sub_key3] := value_strip
+                    temp_dict[sub_key1][sub_key2][sub_key3] := temp_value
                 }
                 continue
             }
@@ -353,7 +359,15 @@ RippleDescriptorJsonParser(filename)
             ;--------------
             if (level = 1)
             {
-                sub_key1 := value_strip
+                ; Add 3 leading zero to "Set_*" number for retain sets order
+                if RegExMatch(value_strip, "Set_")
+                {
+                    sub_key1 := Format("Set_{:03d}", StrReplace(value_strip, "Set_", ""))
+                }
+                else
+                {
+                    sub_key1 := value_strip
+                }
                 check_next_value := true
                 continue
             }
